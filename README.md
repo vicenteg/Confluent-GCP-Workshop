@@ -21,4 +21,9 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
     ```
     $ git clone https://github.com/confluentinc/cp-ansible
     ```
-4. Edit the `ccloud-example-hosts-inventory.yml` and `ccloud-example-playbook.yml` with your hosts, API info, and desired roles to install on which hosts.
+4. Edit the `hosts.gcp-workshop.yml` and `gcp-workshop.yml` with your hosts, API info, and desired roles to install on which hosts, and copy them into the `cp-ansible` directory.
+5. Install Confluent Platform components on the GCP hosts
+    ```
+    $ ansible-playbook --private-key=~/.ssh/google_compute_engine -i hosts.gcp-workshop.yml gcp-workshop.yml
+    ```
+
