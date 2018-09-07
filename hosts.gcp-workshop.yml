@@ -1,0 +1,30 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: chris
+    ansible_become: true
+    security_mode: ccloud
+    confluent:
+      cloud:
+        broker:
+          endpoint: "SASL_SSL://pkc-l9v0e.us-central1.gcp.confluent.cloud:9092"
+        api:
+          key: "apikey"
+          secret: "apisecret"
+preflight:
+  hosts:
+    35.231.187.35:
+    35.237.49.31: 
+schema-registry:
+  hosts:
+    35.231.187.35:
+    35.237.49.31: 
+connect-distributed:
+  hosts:
+    35.231.187.35:
+    35.237.49.31: 
+ksql:
+  hosts:
+    35.231.187.35:
+    35.237.49.31: 
+

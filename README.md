@@ -13,3 +13,12 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
 * [Confluent Ansible scripts](https://github.com/confluentinc/cp-ansible)
 
 ## Agenda
+
+## Setup
+1. Initialize a cluster in Confluent Cloud, and get API key/secret
+2. Creage some GCP hosts, we're using 2 n1-standard-4 (4 vCPUs, 15 GB memory)
+3. Clone the Confluent Ansible repository
+    ```
+    $ git clone https://github.com/confluentinc/cp-ansible
+    ```
+4. Edit the `ccloud-example-hosts-inventory.yml` and `ccloud-example-playbook.yml` with your hosts, API info, and desired roles to install on which hosts.
