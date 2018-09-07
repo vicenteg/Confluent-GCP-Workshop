@@ -1,0 +1,14 @@
+---
+- hosts: connect-distributed
+  tasks:
+  - name: Install Google Cloud Storage plugin from Confluent Hub
+    command: confluent-hub install --no-prompt confluentinc/kafka-connect-gcs:latest
+  - name: Install Google Big Query and Irc Connectors
+    unarchive:
+      remote_src: true
+      src: https://storage.googleapis.com/confluent-gcp-workshop/gcp-workshop-connectors.tgz
+      dest: /usr/share/java
+  - name: Restart Connect
+    systemd:
+      name: confluent-kafka-connect
+      state: restarted
