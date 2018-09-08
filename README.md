@@ -14,8 +14,9 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
 * [Confluent Ansible scripts](https://github.com/cjmatta/cp-ansible/tree/ccloud-profiles)
 
 ## Agenda
+TODO
 
-## Setup
+## Setup Environment
 1. Initialize a cluster in Confluent Cloud, and get API key/secret
 2. Creage some GCP hosts, we're using 2 n1-standard-4 (4 vCPUs, 15 GB memory)
 3. Clone the Confluent Ansible repository
@@ -32,15 +33,20 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
     $ ansible-playbook --private-key=~/.ssh/google_compute_engine -i hosts.gcp-workshop.yml install-connectors-playbook.yml
     ```
 
-### Set up Source
-1. Edit `submit_wikipedia_irc_config.sh` with schema registry IPs, and then submit the connector:
+### Set up Kafka Connect Source
+1. Create `wikipedia` topic:
     ```
-    $ ./submit_wikipedia_irc_config.sh http://<connect-distributed-host>:8083
+    $ ccloud topic create wikipedia --replication-factor 3 --partitions 3
     ```
 
-2. Check the status of the connector:
+2. Edit `submit_wikipedia_irc_config.sh` with schema registry IPs, and then submit the connector:
     ```
-    $ $ curl http://35.231.187.35:8083/connectors/wikipedia-irc/status | jq .
+    $ ./submit_wikipedia_irc_config.sh <connect-distributed-host>
+    ```
+
+3. Check the status of the connector:
+    ```
+    $ curl http://35.231.187.35:8083/connectors/wikipedia-irc/status | jq .
     % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                 Dload  Upload   Total   Spent    Left  Speed
     100   169  100   169    0     0   1631      0 --:--:-- --:--:-- --:--:--  1640
@@ -61,9 +67,9 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
     }
     ```
 
-3. Use the `kafka-avro-console-consumer` to test that data is flowing into the topic:
+4. Use the `kafka-avro-console-consumer` to test that data is flowing into the topic:
     ```
-    $ ${CONFLUENT_HOME}/bin/kafka-avro-console-consumer --bootstrap-server pkc-l9v0e.us-central1.gcp.confluent.cloud:9092 --consumer.config ~/.ccloud/config --topic wikipedia.parsed --property schema.registry.url=http://<schema-registry-ip>:8081
+    $ ${CONFLUENT_HOME}/bin/kafka-avro-console-consumer --bootstrap-server pkc-l9v0e.us-central1.gcp.confluent.cloud:9092 --consumer.config ~/.ccloud/config --topic wikipedia --property schema.registry.url=http://<schema-registry-ip>:8081
     {"createdat":1536371033912,"wikipage":"Jo Hyun-jae","channel":"#en.wikipedia","username":"2.205.55.98","commitmessage":"","bytechange":36,"diffurl":"https://en.wikipedia.org/w/index.php?diff=858558341&oldid=855644132","isnew":false,"isminor":false,"isbot":false,"isunpatrolled":false}
     --- snip ---
     ```
@@ -73,3 +79,7 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
 1. Create service account, and download the authentication json file
 2. Copy keyfile to the connect hosts:
     `$ ansible -i hosts.gcp-workshop.yml --private-key=~/.ssh/google_compute_engine -m copy -a "src=<path to keyfile> dest=/etc/kafka/gbq-keyfile.json" connect-distributed`
+3. Edit `submit_google_big_query_config.sh` with Schema Registry ips:
+    ```
+    $ ./submit_google_big_query_config.sh <connect host ip>
+    ```
