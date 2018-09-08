@@ -83,3 +83,19 @@ TODO
     ```
     $ ./submit_google_big_query_config.sh <connect host ip>
     ```
+
+### KSQL
+1. Log into one of the KSQL servers
+2. Start KSQL CLI
+    ```
+    $ ksql http://localhost:8088
+    ```
+3. Register the wikipedia topic as a stream:
+    ```
+    ksql> create stream wikipedia with (kafka_topic='wikipedia', value_format='avro');
+
+    Message
+    ----------------
+    Stream created
+    ----------------
+    ```
