@@ -12,6 +12,7 @@ This workshop attempts to illustrate how to use Confluent Cloud Platform on GCP
     * [Google Cloud Storage Sink](https://docs.confluent.io/current/connect/kafka-connect-gcs/index.html#kconnect-long-gcs)
 * [Confluent KSQL](https://github.com/confluentinc/ksql)
 * [Confluent Ansible scripts](https://github.com/cjmatta/cp-ansible/tree/ccloud-profiles)
+* [Kafkacat](https://github.com/edenhill/kafkacat)
 
 ## Agenda
 TODO
@@ -84,18 +85,87 @@ TODO
     $ ./submit_google_big_query_config.sh <connect host ip>
     ```
 
-### KSQL
+## KSQL
 1. Log into one of the KSQL servers
 2. Start KSQL CLI
     ```
-    $ ksql http://localhost:8088
+    $ sudo ksql http://localhost:8088
     ```
 3. Register the wikipedia topic as a stream:
     ```
-    ksql> create stream wikipedia with (kafka_topic='wikipedia', value_format='avro');
+    ksql> create stream wikipediasource with (kafka_topic='wikipedia', value_format='avro');
 
     Message
     ----------------
     Stream created
     ----------------
+    ```
+## Joins
+This will demonstrate joining a stream of events to a table of dimensions for data enrichment. The stream of Wikipedia edits will be joined to a compacted topic consisting of channel -> language.
+
+1. Create compacted topic to capture the lookup data:
+    ```
+    $ ccloud topic create wikipedia-language-map --partitions 3 --replication-factor 3 --config cleanup.policy=compact
+    ```
+2. Push lookup data into the topic using the `publish_language_map.sh` (requires [Kafkacat](https://github.com/edenhill/kafkacat)):
+    ```
+    $ ./publish_language_map.sh
+    ```
+3. Consume topic to ensure the data is there:
+    ```
+    $ $ kafkacat -F ~/.ccloud/config -b pkc-l9v0e.us-central1.gcp.confluent.cloud:9092 -C -t wikipedia-language-map -o beginning -K:
+    ```
+4. From KSQL CLI, register the topic as a **TABLE**:
+    ```
+    $ create table wikipedialanguages (channel varchar, language varchar) with (kafka_topic='wikipedia-language-map', value_format='delimited', key='channel');
+    Message
+    ---------------
+    Table created
+    ---------------
+    ```
+5. Select from the table:
+    ```
+    ksql> SET 'auto.offset.reset' = 'earliest';
+    Successfully changed local property 'auto.offset.reset' from 'null' to 'earliest'
+    ksql> select * from wikipedialanguages;
+    1536429549813 | #en.wikipedia | #en.wikipedia | English
+    1536429549813 | #fr.wikipedia | #fr.wikipedia | French
+    1536429549813 | #es.wikipedia | #es.wikipedia | Spanish
+    1536429549813 | #en.wiktionary | #en.wiktionary | English
+    1536429549813 | #de.wikipedia | #de.wikipedia | German
+    1536429549813 | #eo.wikipedia | #eo.wikipedia | Esperanto
+    1536429549813 | #ru.wikipedia | #ru.wikipedia | Russian
+    1536429549813 | #it.wikipedia | #it.wikipedia | Italian
+    1536429549813 | #vo.wikipedia | #vo.wikipedia | Volapük
+    1536429549813 | #zh.wikipedia | #zh.wikipedia | Chinese
+    1536429549813 | #sd.wikipedia | #sd.wikipedia | Arabic
+    1536429549813 | #mediawiki.wikipedia | #mediawiki.wikipedia | English
+    1536429549813 | #commons.wikimedia | #commons.wikimedia | English
+    1536429549813 | #eu.wikipedia | #eu.wikipedia | English
+    1536429549813 | #uk.wikipedia | #uk.wikipedia | English
+    ```
+
+6. Create an enriched stream by joining the edits to the language topic:
+    ```sql
+    create stream wikipedia with ( \
+    kafka_topic = 'wikipediaenriched', \
+    value_format = 'avro' \
+    ) as \
+    select \
+        w.createdat, \
+        w.wikipage, \
+        w.channel channel, \
+        w.username, \
+        w.commitmessage, \
+        w.bytechange, \
+        w.diffurl, \
+        w.isnew, \
+        w.isminor, \
+        w.isbot, \
+        w.isunpatrolled, \
+        l.language \
+    from \
+        wikipediasource w \
+        JOIN wikipedialanguages l on w.channel = l.channel;
+
     ```
