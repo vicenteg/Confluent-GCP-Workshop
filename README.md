@@ -23,6 +23,7 @@ TODO
 3. Clone the Confluent Ansible repository
     ```
     $ git clone https://github.com/cjmatta/cp-ansible
+    $ git checkout ccloud-profiles
     ```
 4. Edit the `hosts.gcp-workshop.yml` and `gcp-workshop.yml` with your hosts, API info, and desired roles to install on which hosts, and copy them into the `cp-ansible` directory.
 5. Install Confluent Platform components on the GCP hosts
