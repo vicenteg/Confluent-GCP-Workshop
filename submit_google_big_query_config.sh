@@ -23,7 +23,7 @@ DATA=$( cat << EOF
     "maxWriteSize": 10000,
     "tableWriteWait": 1000,
     "project": "sales-engineering-206314",
-    "datasets": ".*=wikipediaedits",
+    "datasets": ".*=wikipedia",
     "keyfile": "/etc/kafka/gbq-keyfile.json",
     "tasks.max": "1"
   }
