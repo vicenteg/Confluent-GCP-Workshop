@@ -138,7 +138,7 @@ This will demonstrate joining a stream of events to a table of dimensions for da
 
 6. Create an enriched stream by joining the edits to the language topic:
     ```sql
-    create stream wikipedia with ( \
+    create stream wikipediaedits with ( \
         value_format = 'avro' \
     ) as \
     select \
