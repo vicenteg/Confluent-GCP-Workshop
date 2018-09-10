@@ -75,16 +75,6 @@ TODO
     --- snip ---
     ```
 
-### Set up Sinks
-#### Google Big Query Sink
-1. Create service account, and download the authentication json file
-2. Copy keyfile to the connect hosts:
-    `$ ansible -i hosts.gcp-workshop.yml --private-key=~/.ssh/google_compute_engine -m copy -a "src=<path to keyfile> dest=/etc/kafka/gbq-keyfile.json" connect-distributed`
-3. Edit `submit_google_big_query_config.sh` with Schema Registry ips:
-    ```
-    $ ./submit_google_big_query_config.sh <connect host ip>
-    ```
-
 ## KSQL
 1. Log into one of the KSQL servers
 2. Start KSQL CLI
@@ -113,7 +103,7 @@ This will demonstrate joining a stream of events to a table of dimensions for da
     ```
 3. Consume topic to ensure the data is there:
     ```
-    $ $ kafkacat -F ~/.ccloud/config -b pkc-l9v0e.us-central1.gcp.confluent.cloud:9092 -C -t wikipedia-language-map -o beginning -K:
+    $ kafkacat -F ~/.ccloud/config -b pkc-l9v0e.us-central1.gcp.confluent.cloud:9092 -C -t wikipedia-language-map -o beginning -K:
     ```
 4. From KSQL CLI, register the topic as a **TABLE**:
     ```
@@ -169,3 +159,13 @@ This will demonstrate joining a stream of events to a table of dimensions for da
         JOIN wikipedialanguages l on w.channel = l.channel;
 
     ```
+### Set up Sinks
+#### Google Big Query Sink
+1. Create service account, and download the authentication json file
+2. Copy keyfile to the connect hosts:
+    `$ ansible -i hosts.gcp-workshop.yml --private-key=~/.ssh/google_compute_engine -m copy -a "src=<path to keyfile> dest=/etc/kafka/gbq-keyfile.json" connect-distributed`
+3. Edit `submit_google_big_query_config.sh` with Schema Registry ips:
+    ```
+    $ ./submit_google_big_query_config.sh <connect host ip>
+    ```
+

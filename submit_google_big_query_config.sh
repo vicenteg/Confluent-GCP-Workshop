@@ -9,11 +9,12 @@ fi
 HEADER="Content-Type: application/json"
 DATA=$( cat << EOF
 {
-  "name": "bigquery-sink",
+  "name": "bigquery-wikipediaedits",
   "config": {
     "connector.class": "com.wepay.kafka.connect.bigquery.BigQuerySinkConnector",
-    "topics": "wikipedia",
+    "topics": "WIKIPEDIAEDITS",
     "autoCreateTables": true,
+    "sanitizeTopics": true,
     "autoUpdateSchemas": true,
     "schemaRetriever": "com.wepay.kafka.connect.bigquery.schemaregistry.schemaretriever.SchemaRegistrySchemaRetriever",
     "schemaRegistryLocation": "http://35.231.187.35:8081,http://35.237.49.31:8081",
@@ -23,7 +24,7 @@ DATA=$( cat << EOF
     "project": "sales-engineering-206314",
     "datasets": ".*=wikipediaedits",
     "keyfile": "/etc/kafka/gbq-keyfile.json",
-    "tasks.max": "4"
+    "tasks.max": "1"
   }
 }
 EOF
