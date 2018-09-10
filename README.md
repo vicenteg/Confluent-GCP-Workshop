@@ -19,10 +19,10 @@ TODO
 
 ## Setup Environment
 1. Initialize a cluster in Confluent Cloud, and get API key/secret
-2. Creage some GCP hosts, we're using 2 n1-standard-4 (4 vCPUs, 15 GB memory)
+2. Create some GCP hosts, we're using 2 n1-standard-4 (4 vCPUs, 15 GB memory)
 3. Clone the Confluent Ansible repository
     ```
-    $ git clone https://github.com/cjmatta/cp-ansible/tree/ccloud-profiles
+    $ git clone https://github.com/cjmatta/cp-ansible
     ```
 4. Edit the `hosts.gcp-workshop.yml` and `gcp-workshop.yml` with your hosts, API info, and desired roles to install on which hosts, and copy them into the `cp-ansible` directory.
 5. Install Confluent Platform components on the GCP hosts
