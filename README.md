@@ -105,7 +105,7 @@ This will demonstrate joining a stream of events to a table of dimensions for da
     ```
 3. Consume topic to ensure the data is there:
     ```
-    $ kafkacat -F ~/.ccloud/config -b pkc-l9v0e.us-central1.gcp.confluent.cloud:9092 -C -t wikipedia-language-map -o beginning -K:
+    $ kafkacat -F ~/.ccloud/config -b <broker endpoint>:9092 -C -t wikipedia-language-map -o beginning -K:
     ```
 4. From KSQL CLI, register the topic as a **TABLE**:
     ```
