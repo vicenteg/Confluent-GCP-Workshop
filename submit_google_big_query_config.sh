@@ -18,6 +18,7 @@ DATA=$( cat << EOF
     "autoUpdateSchemas": true,
     "schemaRetriever": "com.wepay.kafka.connect.bigquery.schemaregistry.schemaretriever.SchemaRegistrySchemaRetriever",
     "schemaRegistryLocation": "http://35.231.187.35:8081,http://35.237.49.31:8081",
+    "key.converter":"org.apache.kafka.connect.storage.StringConverter",
     "bufferSize": 100000,
     "maxWriteSize": 10000,
     "tableWriteWait": 1000,
