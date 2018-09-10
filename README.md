@@ -90,6 +90,7 @@ TODO
     Stream created
     ----------------
     ```
+
 ## Joins
 This will demonstrate joining a stream of events to a table of dimensions for data enrichment. The stream of Wikipedia edits will be joined to a compacted topic consisting of channel -> language.
 
@@ -138,8 +139,7 @@ This will demonstrate joining a stream of events to a table of dimensions for da
 6. Create an enriched stream by joining the edits to the language topic:
     ```sql
     create stream wikipedia with ( \
-    kafka_topic = 'wikipediaenriched', \
-    value_format = 'avro' \
+        value_format = 'avro' \
     ) as \
     select \
         w.createdat, \
@@ -156,15 +156,16 @@ This will demonstrate joining a stream of events to a table of dimensions for da
         l.language \
     from \
         wikipediasource w \
-        JOIN wikipedialanguages l on w.channel = l.channel;
+        INNER JOIN wikipedialanguages l on w.channel = l.channel;
 
     ```
+
 ### Set up Sinks
 #### Google Big Query Sink
 1. Create service account, and download the authentication json file
 2. Copy keyfile to the connect hosts:
     `$ ansible -i hosts.gcp-workshop.yml --private-key=~/.ssh/google_compute_engine -m copy -a "src=<path to keyfile> dest=/etc/kafka/gbq-keyfile.json" connect-distributed`
-3. Edit `submit_google_big_query_config.sh` with Schema Registry ips:
+3. Edit `submit_google_big_query_config.sh` with Schema Registry ips, and then submit the config:
     ```
     $ ./submit_google_big_query_config.sh <connect host ip>
     ```
