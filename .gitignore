@@ -1,2 +1,6 @@
+.DS_Store
 *.jar
 *.retry
+*.tar
+*.tgz
+*.gz
