@@ -26,7 +26,7 @@ git clone https://github.com/cjmatta/Confluent-GCP-Workshop.git
 cd Confluent-GCP-Workshop
 ```
 
-1. Install ansible in a virtualenv
+2. Install ansible in a virtualenv
 
 ```bash
 virtualenv env
@@ -34,9 +34,9 @@ source env/bin/activate
 pip install ansible
 ```
 
-1. Initialize a new cluster in Confluent Cloud. https://confluent.cloud/
+3. Initialize a new cluster in Confluent Cloud. https://confluent.cloud/
 
-1. Create some GCP hosts, we're using 2 n1-standard-2 (2 vCPUs, 7.5 GB memory, 200GB Persistent Disk). From Cloud Shell, you can create them like this (change `my-project` to your project ID if you're not using Cloud Shell or if you want to place the instances into a specific project):
+4. Create some GCP hosts, we're using 2 n1-standard-2 (2 vCPUs, 7.5 GB memory, 200GB Persistent Disk). From Cloud Shell, you can create them like this (change `my-project` to your project ID if you're not using Cloud Shell or if you want to place the instances into a specific project). If this is a new project, you may be prompted to enable the Compute Engine APIs.
 
 ```bash
 PROJECT=${DEVSHELL_PROJECT_ID:=my-project}
@@ -55,7 +55,7 @@ for i in $(seq 2); do
 done
 ```
 
-1. Ensure you have SSH keys set up in your home directory
+5. Ensure you have SSH keys set up in your home directory
 
 We enabled OS Login on the new instances so that Ansible can use ssh to access them. If your project is brand new or you do not have google_compute_engine SSH keys, let's create them, then add them to os-login. Note that `gcloud compute config-ssh` will prompt you if you don't already have ssh keys set up in your cloud shell:
 
@@ -64,7 +64,7 @@ gcloud compute config-ssh
 gcloud compute os-login ssh-keys add --key-file ~/.ssh/google_compute_engine.pub
 ```
 
-1. Clone the Confluent Ansible repository
+6. Clone the Confluent Ansible repository
 
 ```bash
 git clone https://github.com/cjmatta/cp-ansible
@@ -72,7 +72,7 @@ cd cp-ansible
 git checkout ccloud-profiles
 ```
 
-1. Use `gcloud compute instances list` to generate the hosts file you'll need for the ansible playbooks:
+7. Use `gcloud compute instances list` to generate the hosts file you'll need for the ansible playbooks:
 
 ```bash
 CP_HOSTS=$(gcloud compute instances list --format=json --filter="name~confluent-cloud"  |\
@@ -96,16 +96,7 @@ confluent-cloud-2
 EOF
 ```
 
-Confirm that ansible can connect to your instances:
-
-```bash
-# N.B., disable host key checking so that you don't have to confirm addition of
-# the host keys to your known_hosts file. Don't do this in production!
-export ANSIBLE_HOST_KEY_CHECKING=False
-ansible -i hosts --key-file=~/.ssh/google_compute_engine -m ping all
-```
-
-1. Install the ccloud tool and initialize the configuration with `ccloud init`. To obtain the information you need to supply to `ccloud init`, visit https://confluent.cloud/clusters and choose the cluster you just created. Click the triple-dot menu and select "Client Config" to access your broker endpoing and API credentials.
+8. Install the ccloud tool and initialize the configuration with `ccloud init`. To obtain the information you need to supply to `ccloud init`, visit https://confluent.cloud/clusters and choose the cluster you just created. Click the triple-dot menu and select "Client Config" to access your broker endpoing and API credentials.
 
 ![ccloud screenshot](images/confluent-client-config.png)
 
@@ -115,7 +106,7 @@ PATH=$PATH:/opt/ccloud-0.2.1/bin/
 ccloud init
 ```
 
-1. Now, use the ccloud configuration to generate the variables file Ansible will use to configure your Compute Engine instances that will run Confluent Platform:
+9. Now, use the ccloud configuration to generate the variables file Ansible will use to configure your Compute Engine instances that will run Confluent Platform:
 
 ```bash
 BOOTSTRAP_SERVER=$(cat ~/.ccloud/config | grep "bootstrap.servers" | awk -F= '{print $2}' | sed s/\\\\:/\:/g)
@@ -139,15 +130,27 @@ confluent:
 EOF
 ```
 
-1. Install Confluent Platform components on the GCP hosts
+Confirm that ansible can connect to your instances using the `ping` module:
 
 ```bash
+# N.B., disable host key checking so that you don't have to confirm addition of
+# the host keys to your known_hosts file. Don't do this in production with long
+# lived hosts!
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible -i hosts --key-file=~/.ssh/google_compute_engine -m ping all
+```
+
+10. Install Confluent Platform components on the GCP hosts
+
+```bash
+cp ../gcp-workshop.yml .
 ansible-playbook --private-key=~/.ssh/google_compute_engine -i hosts gcp-workshop.yml
 ```
 
-1. Install Connect plugins
+11. Install Connect plugins
 
 ```bash
+cp ../install_connectors_playbook.yml .
 ansible-playbook --private-key=~/.ssh/google_compute_engine -i hosts \
     -b --become-user=root install-connectors-playbook.yml
 ```
@@ -160,13 +163,13 @@ ansible-playbook --private-key=~/.ssh/google_compute_engine -i hosts \
 ccloud topic create wikipedia --replication-factor 3 --partitions 3
 ```
 
-1. Edit `submit_wikipedia_irc_config.sh` with schema registry IPs, and then submit the connector:
+2. Edit `submit_wikipedia_irc_config.sh` with schema registry IPs, and then submit the connector:
 
 ```bash
 ./submit_wikipedia_irc_config.sh <connect-distributed-host>
 ```
 
-1. Check the status of the connector:
+3. Check the status of the connector:
 
 ```bash
 $ curl http://35.231.187.35:8083/connectors/wikipedia-irc/status | jq .
