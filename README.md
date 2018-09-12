@@ -19,6 +19,8 @@ TODO
 
 ## Setup Environment
 
+To complete these exercises, you'll need a Compute Engine VM or a local shell environment with the gcloud SDK installed. The ccloud commands used to create topics in Confluent Cloud later will NOT work from Cloud Shell, so it's recommended to use a GCE VM or your Linux or Mac workstation to complete the steps below.
+
 1. Clone this repository:
 
 ```bash
@@ -28,18 +30,22 @@ cd Confluent-GCP-Workshop
 
 2. Install ansible in a virtualenv
 
+You'll need Ansible 2.4.0 or later.
+
 ```bash
 virtualenv env
 source env/bin/activate
-pip install ansible
+pip install 'ansible>=2.4.0'
 ```
 
 3. Initialize a new cluster in Confluent Cloud. https://confluent.cloud/
 
-4. Create some GCP hosts, we're using 2 n1-standard-2 (2 vCPUs, 7.5 GB memory, 200GB Persistent Disk). From Cloud Shell, you can create them like this (change `my-project` to your project ID if you're not using Cloud Shell or if you want to place the instances into a specific project). If this is a new project, you may be prompted to enable the Compute Engine APIs.
+4. Create some GCP hosts, we're using 2 n1-standard-2 (2 vCPUs, 7.5 GB memory, 200GB Persistent Disk). Use the commands below to create the VMs using the `gcloud` command. If this is a new project, you may be prompted to enable the Compute Engine APIs.
+
+Change `my-project-id` to your GCP project ID.
 
 ```bash
-PROJECT=${DEVSHELL_PROJECT_ID:=my-project}
+PROJECT=my-project-id
 ZONE=us-central1-c
 for i in $(seq 2); do
     gcloud beta compute --project=${PROJECT} instances create confluent-cloud-${i} \
